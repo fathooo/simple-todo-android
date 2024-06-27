@@ -38,6 +38,7 @@ android {
     }
     buildFeatures {
 //        compose = true
+        dataBinding = true
         viewBinding = true
     }
     composeOptions {
@@ -75,7 +76,6 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
-
 
 
 
