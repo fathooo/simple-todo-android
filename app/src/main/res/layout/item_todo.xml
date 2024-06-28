@@ -1,11 +1,10 @@
+<!-- res/layout/item_todo.xml -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--res/layout/item_todo.xml -->
     <data>
         <variable
             name="todo"
             type="com.fathooo.technicaltest.data.model.Todo" />
     </data>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +16,7 @@
             android:layout_height="wrap_content"
             android:text="@{todo.title}"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <CheckBox
             android:id="@+id/cbCompleted"
@@ -25,7 +24,24 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tvTitle"
             android:checked="@{todo.completed}"
-            android:text="Completed"/>
+            android:text="Completed" />
 
+        <ImageButton
+            android:id="@+id/btn_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:src="@android:drawable/ic_menu_edit" />
+
+        <ImageButton
+            android:id="@+id/btn_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/btn_edit"
+            android:layout_marginTop="8dp"
+            android:src="@android:drawable/ic_menu_delete" />
     </RelativeLayout>
 </layout>

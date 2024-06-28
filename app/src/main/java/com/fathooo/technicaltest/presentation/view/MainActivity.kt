@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fathooo.technicaltest.data.api.RetrofitClient
+import com.fathooo.technicaltest.data.model.Todo
 import com.fathooo.technicaltest.data.repository.TodosRepositoryImpl
 import com.fathooo.technicaltest.databinding.ActivityMainBinding
 import com.fathooo.technicaltest.domain.usecase.CreateTodoUseCase
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var todoViewModel: TodoViewModel
-    private val adapter by lazy { TodoAdapter(emptyList()) }
+    private val adapter by lazy { TodoAdapter(emptyList(), onEdit = { todo -> editTodoDialog(todo) }, onDelete = { todoId -> deleteTodoDialog(todoId) }) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +44,31 @@ class MainActivity : ComponentActivity() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
-        Log.d("MainActivity", "onCreate")
+        binding.fabAddTodo.setOnClickListener { addTodoDialog() }
+
         todoViewModel.todos.observe(this, { todos ->
-            Log.d("MainActivity", "onCreate: $todos")
             adapter.setTodos(todos)
         })
 
         todoViewModel.loadTodos()
     }
+
+    private fun addTodoDialog() {
+        // Implementar un diálogo para añadir una nueva tarea
+        // Crear la nueva tarea y llamando a todoViewModel.addTodo(newTodo)
+        Log.d("TAG", "addTodoDialog")
+    }
+
+    private fun editTodoDialog(todo: Todo) {
+        // Implementar un diálogo para editar la tarea existente
+        // Actualizando la tarea y llamando a todoViewModel.editTodo(updatedTodo)
+        Log.d("TAG", "editTodoDialog")
+    }
+
+    private fun deleteTodoDialog(todoId: Int) {
+        // Implementar un diálogo para eliminar la tarea existente
+        // Llamando a todoViewModel.removeTodoById(todoId)
+        Log.d("TAG", "deleteTodoDialog")
+    }
+
 }
