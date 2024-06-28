@@ -4,30 +4,40 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="viewModel"
+            type="com.fathooo.technicaltest.presentation.viewmodel.TodoViewModel" />
+    </data>
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         tools:context=".presentation.view.MainActivity">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/fab_add_todo"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_margin="16dp"
+            android:clipToPadding="false"
+            app:layout_constraintBottom_toTopOf="@+id/fab_add_todo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/item_todo" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add_todo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
             android:layout_margin="16dp"
-            app:srcCompat="@android:drawable/ic_input_add"
+            android:contentDescription="@string/add_todo"
+            android:src="@drawable/ic_add_white"
             app:backgroundTint="@color/colorPrimary"
-            app:tint="@color/white"
-            style="@style/FloatingActionButtonStyle"/>
-    </RelativeLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
