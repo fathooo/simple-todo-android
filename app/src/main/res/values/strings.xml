@@ -44,4 +44,5 @@
     </string>
     <string name="completed">completed</string>
     <string name="add_todo">add todo</string>
+    <string name="edit_todo">edit todo</string>
 </resources>

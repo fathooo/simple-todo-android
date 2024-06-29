@@ -18,33 +18,51 @@ class TodoViewModel(
     private val _todos = MutableLiveData<List<Todo>>()
     val todos: LiveData<List<Todo>> get() = _todos
 
+    private val cache = mutableListOf<Todo>()
+    private var isDataLoaded = false
+
+    init {
+        loadTodos()
+    }
+
     fun loadTodos() {
-        viewModelScope.launch {
-            val todoList = getTodosUseCase()
-            _todos.value = todoList
+        if (!isDataLoaded) {
+            viewModelScope.launch {
+                val todoList = getTodosUseCase()
+                cache.addAll(todoList)
+                _todos.value = cache
+                isDataLoaded = true
+            }
+        } else {
+            _todos.value = cache
         }
     }
 
     fun addTodo(todo: Todo) {
         viewModelScope.launch {
             createTodoUseCase(todo)
-            loadTodos() // To refresh the list
+            cache.add(todo)
+            _todos.value = cache
         }
     }
 
     fun editTodo(todo: Todo) {
         viewModelScope.launch {
             updateTodoUseCase(todo)
-            loadTodos() // To refresh the list
+            cache.replaceAll { if (it.id == todo.id) todo else it }
+            _todos.value = cache
         }
     }
 
     fun removeTodoById(id: Int) {
         viewModelScope.launch {
             deleteTodoUseCase(id)
-            loadTodos() // To refresh the list
+            cache.removeAll { it.id == id }
+            _todos.value = cache
         }
     }
+
+    fun getLength(): Int {
+        return cache.size
+    }
 }
-
-
