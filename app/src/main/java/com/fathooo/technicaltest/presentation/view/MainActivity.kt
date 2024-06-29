@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.fathooo.technicaltest.R
 import com.fathooo.technicaltest.data.api.RetrofitClient
 import com.fathooo.technicaltest.data.model.Todo
 import com.fathooo.technicaltest.data.repository.TodosRepositoryImpl
@@ -55,29 +56,39 @@ class MainActivity : ComponentActivity() {
         todoViewModel.todos.observe(this, { todos ->
             adapter.setTodos(todos)
         })
+        todoViewModel.error.observe(this, { errorMessage ->
+            errorMessage?.let {
+                showToastMessage(it, false)
+                todoViewModel.errorHandled()
+            }
+        })
 
-        todoViewModel.loadTodos()
+        todoViewModel.success.observe(this, { successMessage ->
+            successMessage?.let {
+                showToastMessage(it, true)
+                todoViewModel.successHandled()
+            }
+        })
+
+
     }
 
     private fun addTodoDialog() {
         val dialogBinding = DialogAddTodoBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+
         val dialog = AlertDialog.Builder(this)
             .setTitle("Add Todo")
             .setView(dialogBinding.root)
             .setPositiveButton("Add") { _, _ ->
                 val title = dialogBinding.addTodo.text.toString()
-                val length = todoViewModel.getLength()
                 if (title.isNotEmpty()) {
                     val newTodo = Todo(
-                        id = length + 1,
+                        id = todoViewModel.getLength() + 1,
                         userId = 1,
                         title = title,
                         completed = false
                     )
                     todoViewModel.addTodo(newTodo)
-                    Log.d("DEBUG", "Todo added: $newTodo")
-                    showCustomToast("Todo added: $title")
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -87,7 +98,6 @@ class MainActivity : ComponentActivity() {
 
     private fun editTodoDialog(todo: Todo) {
         val dialogBinding = DialogEditTodoBinding.inflate(layoutInflater)
-        setContentView(binding.root)
         dialogBinding.editTodo.setText(todo.title)
 
         val dialog = AlertDialog.Builder(this)
@@ -98,8 +108,6 @@ class MainActivity : ComponentActivity() {
                 if (updatedTitle.isNotEmpty()) {
                     val updatedTodo = todo.copy(title = updatedTitle)
                     todoViewModel.editTodo(updatedTodo)
-                    Log.d("DEBUG", "Todo edited: $updatedTodo")
-                    showCustomToast("Todo edited: $updatedTitle")
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -112,25 +120,23 @@ class MainActivity : ComponentActivity() {
             .setMessage("Do you want to delete this Todo?")
             .setPositiveButton("Delete") { _, _ ->
                 todoViewModel.removeTodoById(todoId)
-                Log.d("DEBUG", "Todo deleted: $todoId")
-                showCustomToast("Todo deleted")
             }
             .setNegativeButton("Cancel", null)
             .create()
         dialog.show()
     }
 
-    private fun showCustomToast(message: String) {
+    private fun showToastMessage(message: String, isSuccess: Boolean) {
+        val toast = Toast(applicationContext)
+        toast.duration = Toast.LENGTH_LONG
+        toast.setGravity(Gravity.CENTER, 0, 0)
+
         val toastNotifyBinding = NotifyToastBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
         toastNotifyBinding.toastText.text = message
-
-        with (Toast(applicationContext)) {
-            duration = Toast.LENGTH_LONG
-            setGravity(Gravity.CENTER, 0, 0)
-            view = toastNotifyBinding.root
-            show()
-        }
+        toastNotifyBinding.toastIcon.setImageResource(
+            if (isSuccess) R.drawable.ic_check_circle_black_24dp else android.R.drawable.ic_dialog_alert
+        )
+        toast.view = toastNotifyBinding.root
+        toast.show()
     }
 }
