@@ -24,6 +24,7 @@ class TodoViewModel(
     private val _success = MutableLiveData<String?>()
     val success: LiveData<String?> get() = _success
 
+    var isAscending = true
     private val cache = mutableListOf<Todo>()
     private var isDataLoaded = false
 
@@ -89,6 +90,24 @@ class TodoViewModel(
 
     fun getLength(): Int {
         return cache.size
+    }
+
+    fun filterTodos(query: String) {
+        _todos.value = cache.filter { it.title.contains(query, ignoreCase = true) }
+    }
+
+    fun toggleSortOrder() {
+        isAscending = !isAscending
+    }
+
+    fun sortTodosAscending() {
+        cache.sortBy { it.id }
+        _todos.value = cache
+    }
+
+    fun sortTodosDescending() {
+        cache.sortByDescending { it.id }
+        _todos.value = cache
     }
 
     fun errorHandled() {

@@ -2,6 +2,8 @@ package com.fathooo.technicaltest.presentation.view
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -20,7 +22,14 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding
     private val todoViewModel: TodoViewModel by viewModel()
-    private val adapter by lazy { TodoAdapter(emptyList(), onEdit = { todo -> editTodoDialog(todo) }, onDelete = { todoId -> deleteTodoDialog(todoId) }, onCompletedChanged = { updatedTodo -> todoViewModel.editTodo(updatedTodo)}) }
+    private val adapter by lazy {
+        TodoAdapter(
+            emptyList(),
+            onEdit = { todo -> editTodoDialog(todo) },
+            onDelete = { todoId -> deleteTodoDialog(todoId) },
+            onCompletedChanged = { updatedTodo -> todoViewModel.editTodo(updatedTodo) }
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +42,25 @@ class MainActivity : ComponentActivity() {
         binding.recyclerView.adapter = adapter
 
         binding.fabAddTodo.setOnClickListener { addTodoDialog() }
+
+        binding.searchTodo.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                todoViewModel.filterTodos(s.toString())
+            }
+        })
+
+        binding.btnSort.setOnClickListener {
+            if (todoViewModel.isAscending) {
+                todoViewModel.sortTodosDescending()
+                binding.btnSort.setImageResource(R.drawable.ic_sort_desc)
+            } else {
+                todoViewModel.sortTodosAscending()
+                binding.btnSort.setImageResource(R.drawable.ic_sort_asc)
+            }
+            todoViewModel.toggleSortOrder()
+        }
 
         todoViewModel.todos.observe(this, Observer { todos ->
             adapter.setTodos(todos)
@@ -50,7 +78,6 @@ class MainActivity : ComponentActivity() {
                 todoViewModel.successHandled()
             }
         })
-
     }
 
     private fun addTodoDialog() {
