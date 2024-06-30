@@ -2,47 +2,28 @@ package com.fathooo.technicaltest.presentation.view
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fathooo.technicaltest.R
-import com.fathooo.technicaltest.data.api.RetrofitClient
 import com.fathooo.technicaltest.data.model.Todo
-import com.fathooo.technicaltest.data.repository.TodosRepositoryImpl
 import com.fathooo.technicaltest.databinding.ActivityMainBinding
 import com.fathooo.technicaltest.databinding.DialogAddTodoBinding
 import com.fathooo.technicaltest.databinding.DialogEditTodoBinding
 import com.fathooo.technicaltest.databinding.NotifyToastBinding
-import com.fathooo.technicaltest.domain.usecase.CreateTodoUseCase
-import com.fathooo.technicaltest.domain.usecase.DeleteTodoUseCase
-import com.fathooo.technicaltest.domain.usecase.GetTodosUseCase
-import com.fathooo.technicaltest.domain.usecase.UpdateTodoUseCase
 import com.fathooo.technicaltest.presentation.adapter.TodoAdapter
 import com.fathooo.technicaltest.presentation.viewmodel.TodoViewModel
-import com.fathooo.technicaltest.presentation.viewmodel.TodoViewModelFactory
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-
     private lateinit var binding: ActivityMainBinding
-    private lateinit var todoViewModel: TodoViewModel
+    private val todoViewModel: TodoViewModel by viewModel()
     private val adapter by lazy { TodoAdapter(emptyList(), onEdit = { todo -> editTodoDialog(todo) }, onDelete = { todoId -> deleteTodoDialog(todoId) }, onCompletedChanged = { updatedTodo -> todoViewModel.editTodo(updatedTodo)}) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val apiService = RetrofitClient.api
-        val repository = TodosRepositoryImpl(apiService)
-
-        val getTodosUseCase = GetTodosUseCase(repository)
-        val createTodoUseCase = CreateTodoUseCase(repository)
-        val updateTodoUseCase = UpdateTodoUseCase(repository)
-        val deleteTodoUseCase = DeleteTodoUseCase(repository)
-
-        val viewModelFactory = TodoViewModelFactory(getTodosUseCase, createTodoUseCase, updateTodoUseCase, deleteTodoUseCase)
-        todoViewModel = ViewModelProvider(this, viewModelFactory).get(TodoViewModel::class.java)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -53,23 +34,22 @@ class MainActivity : ComponentActivity() {
 
         binding.fabAddTodo.setOnClickListener { addTodoDialog() }
 
-        todoViewModel.todos.observe(this, { todos ->
+        todoViewModel.todos.observe(this, Observer { todos ->
             adapter.setTodos(todos)
         })
-        todoViewModel.error.observe(this, { errorMessage ->
+        todoViewModel.error.observe(this, Observer { errorMessage ->
             errorMessage?.let {
                 showToastMessage(it, false)
                 todoViewModel.errorHandled()
             }
         })
 
-        todoViewModel.success.observe(this, { successMessage ->
+        todoViewModel.success.observe(this, Observer { successMessage ->
             successMessage?.let {
                 showToastMessage(it, true)
                 todoViewModel.successHandled()
             }
         })
-
 
     }
 
